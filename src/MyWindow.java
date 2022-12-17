@@ -7,8 +7,8 @@ import java.io.IOException;
 
 public class MyWindow extends JPanel {
     int width, height;
-    BufferedImage image;
-    Graphics2D graphics2D;
+    BufferedImage image, sky;
+    Graphics2D graphics2D, skyGraphics2D;
 
     boolean[][] grow;
     JFrame window;
@@ -25,11 +25,11 @@ public class MyWindow extends JPanel {
         this.height = height;
         this.window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         this.grow = new boolean[width][height];
-        System.out.println(grow);
         fillGrow();
         first_draw_color();
         this.window.pack();
         setCircle(400, 400, 50);
+        drawSky();
     }
 
     public void fillGrow() {
@@ -44,9 +44,9 @@ public class MyWindow extends JPanel {
     }
 
     public void setCircle(int xcoord, int ycoord, int radius) {
-        for (int i = xcoord - radius;i <= xcoord + radius; i++) {
-            for (int j = ycoord - radius; j <= ycoord + radius; j++) {
-                if ((i - xcoord) * (i - xcoord) + (j - ycoord) * (j - ycoord) <= radius){
+        for (int i = xcoord - radius; i <= xcoord + radius && i < this.width; i++) {
+            for (int j = ycoord - radius; j <= ycoord + radius && j < this.height; j++) {
+                if ((i - xcoord) * (i - xcoord) + (j - ycoord) * (j - ycoord) <= radius * radius) {
                     this.grow[i][j] = false;
                     byte alpha = 0;
                     int color = this.image.getRGB(i, j);
@@ -57,6 +57,30 @@ public class MyWindow extends JPanel {
                 }
             }
         }
+    }
+
+    public void xxx(){
+        try {
+            this.sky = ImageIO.read(new File("Data/Resurses/img_1.png"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        this.skyGraphics2D = (Graphics2D) this.sky.getGraphics();
+        this.skyGraphics2D.dispose();
+        ImageIcon icon = new ImageIcon(this.sky);
+        this.window.add(new JLabel(icon));
+    }
+
+    public void drawSky() {
+        try {
+            this.sky = ImageIO.read(new File("Data/Resurses/sky.png"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        this.skyGraphics2D = (Graphics2D) this.sky.getGraphics();
+        this.skyGraphics2D.dispose();
+        ImageIcon icon = new ImageIcon(this.sky);
+        this.window.add(new JLabel(icon));
     }
 
     public void first_draw_color() {
@@ -81,32 +105,6 @@ public class MyWindow extends JPanel {
                 }
             }
         }
-    }
-
-    public void firstDrawGrow() {
-        this.image = new BufferedImage(this.width, this.height, BufferedImage.TYPE_INT_ARGB);
-        this.graphics2D = (Graphics2D) this.image.getGraphics();
-        this.graphics2D.setColor(Color.white);
-        Color n = new Color(0, 255, 0, 255);
-        this.graphics2D.setColor(n);
-        //this.graphics2D.setColor(Color.green);
-        //this.graphics2D.drawLine(0, 0, 640, 480);
-        for (int i = 0; i < this.width; i++) {
-            for (int j = 0; j < this.height; j++) {
-                if (this.grow[i][j])
-                    this.graphics2D.fillRect(i, j, 1, 1);
-            }
-        }
-        this.graphics2D.dispose();
-        ImageIcon icon = new ImageIcon(this.image);
-        this.window.add(new JLabel(icon));
-        File outputfile = new File("grow.png");
-        try {
-            ImageIO.write(this.image, "png", outputfile);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
     }
 
     public void setVisible(boolean f) {
